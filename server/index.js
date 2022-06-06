@@ -19,7 +19,7 @@ app.use(cors());
 //define router to the parent route /posts
 app.use("/posts", postRoutes);
 app.use("/users", userRoutes);
-app.use("/", (req, res) => {
+app.get("/", (req, res) => {
   res.send("Wellcom to memories");
 });
 
