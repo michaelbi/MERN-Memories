@@ -26,7 +26,7 @@ app.get("/", (req, res) => {
 //setting connetion url to mongoDB
 const CONNECTION_URL = process.env.CONNECTION_URL;
 // "mongodb+srv://mbitan:2241992Mb@michael.mrygh.mongodb.net/michael";
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT;
 
 //connect to mongoDB online
 mongoose
