@@ -1,6 +1,21 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { AppBar, Avatar, Button, Toolbar, Typography } from "@material-ui/core";
+import {
+  AppBar,
+  Avatar,
+  Button,
+  Toolbar,
+  Typography,
+  IconButton,
+  Tooltip,
+  Menu,
+  MenuItem,
+  Divider,
+  ListItemIcon,
+  useMediaQuery,
+  useTheme,
+} from "@material-ui/core";
+import ExitToAppIcon from "@material-ui/icons/ExitToApp";
 import { useDispatch, useSelector } from "react-redux";
 import decode from "jwt-decode";
 import memories from "../../images/memories.png";
@@ -11,6 +26,23 @@ const Navbar = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [anchorEl, setAnchorEl] = useState(null);
+  const open = Boolean(anchorEl);
+  const theme = useTheme();
+  const small = useMediaQuery(theme.breakpoints.down("xs"));
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleMenu = (event) => {
+    if (event.target.id === "logout") {
+      logout();
+      setAnchorEl(null);
+    }
+  };
 
   // const [user, setUser] = useState(JSON.parse(localStorage.getItem("profile")));
   const user = useSelector((state) => state.auth.authData);
@@ -46,7 +78,7 @@ const Navbar = () => {
           className={classes.heading}
           component={Link}
           to="/"
-          variant="h2"
+          variant={small ? "h5" : "h2"}
           align="center"
         >
           Memories
@@ -58,7 +90,7 @@ const Navbar = () => {
           height="60"
         />
       </div>
-      <Toolbar className={classes.toolbar}>
+      {/* <Toolbar className={classes.toolbar}>
         {user ? (
           <div className={classes.profile}>
             <Avatar
@@ -90,7 +122,100 @@ const Navbar = () => {
             Sign In
           </Button>
         )}
+      </Toolbar> */}
+
+      <Toolbar className={classes.toolbar}>
+        {user ? (
+          <Tooltip title="Settings">
+            <IconButton
+              size="small"
+              onClick={handleClick}
+              sx={{ ml: 2 }}
+              aria-controls={open ? "account-menu" : undefined}
+              aria-haspopup="true"
+              aria-expanded={open ? "true" : undefined}
+            >
+              {
+                <Avatar
+                  className={classes.purple}
+                  alt={user?.result?.name}
+                  src={user?.result?.imageUrl}
+                >
+                  {user?.result?.name.charAt(0)}
+                </Avatar>
+              }
+            </IconButton>
+          </Tooltip>
+        ) : (
+          <Button
+            component={Link}
+            to="/auth"
+            variant="contained"
+            color="primary"
+          >
+            Sign In
+          </Button>
+        )}
       </Toolbar>
+      <Menu
+        anchorEl={anchorEl}
+        getContentAnchorEl={null}
+        id="account-menu"
+        open={open}
+        onClose={handleClose}
+        onClick={handleMenu}
+        transformOrigin={{ horizontal: "right", vertical: "top" }}
+        anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
+        PaperProps={{
+          elevation: 0,
+          sx: {
+            overflow: "visible",
+            filter: "drop-shadow(0px 2px 8px rgba(0,0,0,0.32))",
+            mt: 1.5,
+            "& .MuiAvatar-root": {
+              width: 32,
+              height: 32,
+              ml: -0.5,
+              mr: 1,
+            },
+            "&:before": {
+              content: '""',
+              display: "block",
+              position: "absolute",
+              top: 0,
+              right: 14,
+              width: 10,
+              height: 10,
+              bgcolor: "background.paper",
+              transform: "translateY(-50%) rotate(45deg)",
+              zIndex: 0,
+            },
+          },
+        }}
+      >
+        <MenuItem id="profile">
+          {
+            <Avatar
+              className={classes.purple}
+              alt={user?.result?.name}
+              src={user?.result?.imageUrl}
+            >
+              {user?.result?.name.charAt(0)}
+            </Avatar>
+          }
+          &nbsp;&nbsp;
+          {user?.result?.name}
+        </MenuItem>
+
+        <Divider />
+
+        <MenuItem id="logout">
+          <ListItemIcon>
+            <ExitToAppIcon fontSize="small" />
+          </ListItemIcon>
+          Logout
+        </MenuItem>
+      </Menu>
     </AppBar>
   );
 };
